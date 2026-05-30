@@ -20,11 +20,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
       match: [/\S+@\S+\.\S+/, 'Invalid email format'],
     },
-    password: {
-      type: String,
-      required: [true, 'Password is required'],
-      minlength: [6, 'Password must be at least 6 characters'],
-    },
+   password: {
+  type: String,
+  required: [true, 'Password is required'],
+  minlength: [6, 'Password must be at least 6 characters'],
+  select: false, // 👈 add this
+},
     bio: { type: String, default: '', maxlength: 160 },
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],

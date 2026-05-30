@@ -1,7 +1,7 @@
 {
   "name": "ecommerce-backend",
   "version": "1.0.0",
-  "description": "REST API backend for ShopAlpha e-commerce",
+  "description": "REST API backend for V-Store e-commerce",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
