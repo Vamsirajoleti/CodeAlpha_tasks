@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — ShopAlpha</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/main.css" />
+</head>
+<body>
+
+  <!-- ── Header / Nav ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="container">
+      <a class="brand" href="index.html">🛍 V-Store</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">
+          Cart <span id="cart-count">0</span>
+        </a>
+        <a href="login.html" id="auth-link">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main>
+    <div class="container">
+      <h1 class="page-title">Checkout</h1>
+
+      <!-- Two-column layout: form + order summary -->
+      <div class="checkout-layout">
+
+        <!-- Left: shipping address form -->
+        <div class="checkout-form">
+          <h2>Shipping Details</h2>
+
+          <div class="form-group">
+            <label for="address">Delivery Address</label>
+            <textarea
+              id="address"
+              class="form-control"
+              placeholder="House no., Street, City, State, PIN"
+              required
+            ></textarea>
+          </div>
+
+          <button
+            class="btn btn-primary btn-block mt-2"
+            id="place-order-btn"
+            onclick="placeOrder()"
+          >
+            Place Order
+          </button>
+        </div>
+
+        <!-- Right: order summary -->
+        <div class="order-summary">
+          <h3>Order Summary</h3>
+
+          <!-- Items list — filled by JS -->
+          <div id="checkout-items"></div>
+
+          <hr class="divider" />
+
+          <div class="summary-row total">
+            <span>Total</span>
+            <span id="checkout-total">₹0</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Shared utilities ───────────────────────────────────── -->
+  <script src="assets/main.js"></script>
+
+  <!-- ── Page-specific logic ───────────────────────────────── -->
+  <script>
+
+    // ── Guard: redirect if not logged in ────────────────────
+    // Runs immediately so unauthenticated users never see this page.
+    (function authGuard() {
+      if (!getToken()) {
+        alert('Please log in to checkout.');
+        window.location.href = 'login.html';
+      }
+    })();
+
+    // ── Guard: redirect if cart is empty ────────────────────
+    (function cartGuard() {
+      if (getCart().length === 0) {
+        alert('Your cart is empty.');
+        window.location.href = 'cart.html';
+      }
+    })();
+
+    /**
+     * Renders the mini order summary in the right sidebar.
+     * Called once on page load.
+     */
+    function renderOrderSummary() {
+      const cart    = getCart();
+      const itemsEl = document.getElementById('checkout-items');
+      const totalEl = document.getElementById('checkout-total');
+
+      itemsEl.innerHTML = cart.map(item => `
+        <div class="summary-row">
+          <span>${item.title} × ${item.quantity}</span>
+          <span>₹${(item.price * item.quantity).toFixed(2)}</span>
+        </div>
+      `).join('');
+
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      totalEl.textContent = `₹${total.toFixed(2)}`;
+    }
+
+    /**
+     * Submits the order to the API.
+     * On success: clears the cart and redirects to home.
+     * On failure: shows the error message from the server.
+     */
+    async function placeOrder() {
+      const address = document.getElementById('address').value.trim();
+      const btn     = document.getElementById('place-order-btn');
+
+      if (!address) {
+        showToast('Please enter a delivery address.');
+        return;
+      }
+
+      const token = getToken();
+      const items = getCart();
+
+      // Disable button to prevent duplicate submissions
+      btn.disabled    = true;
+      btn.textContent = 'Placing order…';
+
+      try {
+        const res = await fetch(API_BASE + '/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type':  'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ items, address })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          // Clear cart on success
+          saveCart([]);
+          updateCartCount();
+
+          showToast('Order placed successfully! 🎉', 3000);
+          setTimeout(() => { window.location.href = 'index.html'; }, 1800);
+
+        } else {
+          showToast(data.message || 'Order failed. Please try again.');
+          btn.disabled    = false;
+          btn.textContent = 'Place Order';
+        }
+
+      } catch (err) {
+        showToast('Network error. Check your connection.');
+        btn.disabled    = false;
+        btn.textContent = 'Place Order';
+      }
+    }
+
+    // Render the mini summary on page load
+    renderOrderSummary();
+  </script>
+
+</body>
+</html>

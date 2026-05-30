@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — ShopAlpha</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/main.css" />
+</head>
+<body>
+
+  <!-- ── Header / Nav ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="container">
+      <a class="brand" href="index.html">🛍 V-Store</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">
+          Cart <span id="cart-count">0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main>
+    <div class="container">
+      <div class="auth-card mt-3">
+
+        <h2>Create account</h2>
+        <p class="subtitle">Join ShopAlpha and start shopping</p>
+
+        <!-- Register form -->
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            id="name"
+            type="text"
+            class="form-control"
+            placeholder="Jane Doe"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            class="form-control"
+            placeholder="Min. 6 characters"
+            required
+          />
+        </div>
+
+        <button
+          class="btn btn-primary btn-block mt-2"
+          id="register-btn"
+          onclick="handleRegister()"
+        >
+          Create Account
+        </button>
+
+        <div class="auth-footer mt-2">
+          Already have an account? <a href="login.html">Log in</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Shared utilities ───────────────────────────────────── -->
+  <script src="assets/main.js"></script>
+
+  <!-- ── Page-specific logic ───────────────────────────────── -->
+  <script>
+
+    // Redirect already-logged-in users away from this page
+    if (getToken()) {
+      window.location.href = 'index.html';
+    }
+
+    /**
+     * Reads name, email, password; posts to the register API.
+     * On success: stores the JWT token and redirects to home.
+     * On failure: shows the server's error message.
+     */
+    async function handleRegister() {
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('register-btn');
+
+      // Basic client-side validation
+      if (!name || !email || !password) {
+        showToast('Please fill in all fields.');
+        return;
+      }
+
+      if (password.length < 6) {
+        showToast('Password must be at least 6 characters.');
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Creating account…';
+
+      try {
+        const res = await fetch(API_BASE + '/auth/register', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('token', data.token);
+          showToast('Account created! Welcome 🎉', 1500);
+          setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+
+        } else {
+          showToast(data.message || 'Registration failed. Try again.');
+          btn.disabled    = false;
+          btn.textContent = 'Create Account';
+        }
+
+      } catch (err) {
+        showToast('Network error. Is the backend running?');
+        btn.disabled    = false;
+        btn.textContent = 'Create Account';
+      }
+    }
+
+    // Allow submitting with the Enter key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleRegister();
+    });
+  </script>
+
+</body>
+</html>

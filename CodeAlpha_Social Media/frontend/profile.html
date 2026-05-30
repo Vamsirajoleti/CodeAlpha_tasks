@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-gram — Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="profile">
+
+  <div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 42 42" fill="none">
+          <rect width="42" height="42" rx="12" fill="#7C3AED"/>
+          <path d="M21 8L33 20.5L21 33L9 20.5L21 8Z" fill="white" opacity="0.9"/>
+          <circle cx="21" cy="20.5" r="5" fill="#7C3AED"/>
+        </svg>
+        <span>V-gram</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="feed.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          <span>Home</span>
+        </a>
+        <a href="search.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <span>Search</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span>Profile</span>
+        </a>
+        <a href="feed.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>New Post</span>
+        </a>
+        <button class="nav-item nav-logout" onclick="logout()">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-user">
+        <img id="sidebar-avatar" src="https://i.pravatar.cc/80?u=me" alt="you">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-username">Loading…</div>
+          <div class="sidebar-user-label">Your account</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Profile Content ── -->
+    <main class="main-content">
+
+      <div class="profile-info-card">
+        <!-- Cover gradient -->
+        <div class="profile-cover" style="background:linear-gradient(135deg,#1a0533 0%,#7C3AED 50%,#1e3a5f 100%)"></div>
+
+        <div class="profile-info-body">
+          <div class="profile-avatar-wrap">
+            <img id="profile-avatar" class="profile-avatar" src="https://i.pravatar.cc/80?u=me" alt="avatar">
+          </div>
+
+          <div class="profile-name" id="profile-name">
+            <div class="skeleton sk-line" style="width:160px;height:20px;margin-bottom:8px"></div>
+          </div>
+          <div class="profile-username" id="profile-username">
+            <div class="skeleton sk-line" style="width:100px;height:14px;margin-bottom:8px"></div>
+          </div>
+          <div class="profile-bio" id="profile-bio">
+            <div class="skeleton sk-line" style="width:240px;height:14px;margin-bottom:18px"></div>
+          </div>
+
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-num" id="profile-posts-count">—</div>
+              <div class="stat-label">Posts</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num" id="profile-followers-count">—</div>
+              <div class="stat-label">Followers</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num" id="profile-following-count">—</div>
+              <div class="stat-label">Following</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Posts Grid -->
+      <h3 style="font-size:1rem;font-weight:700;margin-bottom:14px;color:var(--text-2)">Posts</h3>
+      <div class="posts-grid" id="profile-posts-grid">
+        <div class="skeleton" style="aspect-ratio:1;border-radius:0"></div>
+        <div class="skeleton" style="aspect-ratio:1;border-radius:0"></div>
+        <div class="skeleton" style="aspect-ratio:1;border-radius:0"></div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <div class="toast-container"></div>
+  <script src="script.js"></script>
+</body>
+</html>

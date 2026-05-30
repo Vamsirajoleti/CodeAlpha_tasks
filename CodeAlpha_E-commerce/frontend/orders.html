@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Orders — ShopAlpha</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/main.css" />
+
+  <style>
+    /* ── Order card ── */
+    .order-card {
+      background: #fff;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .order-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg);
+    }
+
+    .order-id {
+      font-size: .82rem;
+      color: var(--color-text-muted);
+    }
+
+    .order-id span {
+      font-weight: 700;
+      color: var(--color-text);
+      font-family: monospace;
+    }
+
+    .order-date {
+      font-size: .85rem;
+      color: var(--color-text-muted);
+    }
+
+    /* ── Status badge ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      border-radius: 99px;
+      font-size: .82rem;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
+    .status-pending    { background: #fef9c3; color: #a16207; }
+    .status-processing { background: #e0f2fe; color: #0369a1; }
+    .status-shipped    { background: #f0fdf4; color: #15803d; }
+    .status-delivered  { background: #dcfce7; color: #166534; }
+
+    /* ── Tracking bar ── */
+    .tracking-bar {
+      padding: 24px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .tracking-bar h4 {
+      font-size: .88rem;
+      color: var(--color-text-muted);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .steps {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      position: relative;
+    }
+
+    /* connector line between steps */
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      width: 100%;
+      height: 3px;
+      background: var(--color-border);
+      z-index: 0;
+    }
+
+    .step.done:not(:last-child)::after {
+      background: var(--color-success);
+    }
+
+    .step-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 3px solid var(--color-border);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .85rem;
+      position: relative;
+      z-index: 1;
+      transition: all .3s;
+    }
+
+    .step.done .step-circle {
+      border-color: var(--color-success);
+      background: var(--color-success);
+      color: #fff;
+    }
+
+    .step.active .step-circle {
+      border-color: var(--color-accent);
+      background: var(--color-accent);
+      color: #fff;
+      box-shadow: 0 0 0 4px rgba(233,69,96,.15);
+    }
+
+    .step-label {
+      font-size: .78rem;
+      font-weight: 600;
+      margin-top: 8px;
+      color: var(--color-text-muted);
+      text-align: center;
+    }
+
+    .step.done .step-label,
+    .step.active .step-label {
+      color: var(--color-text);
+    }
+
+    /* ── Order items list ── */
+    .order-items {
+      padding: 20px 24px;
+    }
+
+    .order-item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-border);
+      font-size: .92rem;
+    }
+
+    .order-item-row:last-child { border-bottom: none; }
+
+    .order-item-name { font-weight: 600; }
+    .order-item-qty  { color: var(--color-text-muted); font-size: .85rem; }
+    .order-item-price { font-weight: 700; color: var(--color-accent); }
+
+    /* ── Order footer ── */
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 24px;
+      background: var(--color-bg);
+      border-top: 1px solid var(--color-border);
+      font-size: .92rem;
+    }
+
+    .order-address {
+      color: var(--color-text-muted);
+      font-size: .85rem;
+      max-width: 300px;
+    }
+
+    .order-total {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="container">
+      <a class="brand" href="index.html">🛍 V-Store</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="orders.html" class="active">My Orders</a>
+        <a href="cart.html" class="cart-link">
+          Cart <span id="cart-count">0</span>
+        </a>
+        <a href="login.html" id="auth-link">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">My Orders</h1>
+      <div id="orders-list"></div>
+    </div>
+  </main>
+
+  <script src="assets/main.js"></script>
+  <script>
+
+    // Redirect if not logged in
+    if (!getToken()) {
+      alert('Please log in to view your orders.');
+      window.location.href = 'login.html';
+    }
+
+    // Tracking steps config
+    const STEPS = [
+      { key: 'pending',    icon: '🕐', label: 'Order Placed' },
+      { key: 'processing', icon: '⚙️',  label: 'Processing'   },
+      { key: 'shipped',    icon: '🚚', label: 'Shipped'       },
+      { key: 'delivered',  icon: '✅', label: 'Delivered'     },
+    ];
+
+    /**
+     * Returns the tracking bar HTML for a given order status.
+     */
+    function buildTrackingBar(status) {
+      const currentIdx = STEPS.findIndex(s => s.key === status);
+
+      const stepsHTML = STEPS.map((step, i) => {
+        const isDone   = i < currentIdx;
+        const isActive = i === currentIdx;
+        const cls      = isDone ? 'done' : isActive ? 'active' : '';
+
+        return `
+          <div class="step ${cls}">
+            <div class="step-circle">${isDone ? '✓' : step.icon}</div>
+            <span class="step-label">${step.label}</span>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <div class="tracking-bar">
+          <h4>📍 Order Tracking</h4>
+          <div class="steps">${stepsHTML}</div>
+        </div>
+      `;
+    }
+
+    /**
+     * Formats a date string to readable format.
+     */
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('en-IN', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    /**
+     * Fetches all orders for the logged-in user and renders them.
+     */
+    async function loadOrders() {
+      const container = document.getElementById('orders-list');
+      container.innerHTML = `<div class="card skeleton" style="height:200px;margin-bottom:16px"></div>
+                             <div class="card skeleton" style="height:200px"></div>`;
+
+      try {
+        const res = await fetch(API_BASE + '/orders/mine', {
+          headers: { 'Authorization': 'Bearer ' + getToken() }
+        });
+
+        if (!res.ok) throw new Error('Failed to fetch orders');
+
+        const orders = await res.json();
+
+        if (orders.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📦</div>
+              <h3>No orders yet</h3>
+              <p>Your orders will appear here after you place one.</p>
+              <a href="index.html" class="btn btn-primary mt-2">Start Shopping</a>
+            </div>`;
+          return;
+        }
+
+        container.innerHTML = orders.map(order => `
+          <div class="order-card">
+
+            <!-- Order header -->
+            <div class="order-header">
+              <div>
+                <div class="order-id">Order ID: <span>#${order._id.slice(-8).toUpperCase()}</span></div>
+                <div class="order-date">📅 ${formatDate(order.createdAt)}</div>
+              </div>
+              <span class="status-badge status-${order.status}">
+                ${order.status === 'pending'    ? '🕐' :
+                  order.status === 'processing' ? '⚙️'  :
+                  order.status === 'shipped'    ? '🚚' : '✅'}
+                ${order.status}
+              </span>
+            </div>
+
+            <!-- Tracking bar -->
+            ${buildTrackingBar(order.status)}
+
+            <!-- Items list -->
+            <div class="order-items">
+              ${order.items.map(item => `
+                <div class="order-item-row">
+                  <div>
+                    <div class="order-item-name">${item.title}</div>
+                    <div class="order-item-qty">Qty: ${item.quantity}</div>
+                  </div>
+                  <div class="order-item-price">₹${(item.price * item.quantity).toFixed(2)}</div>
+                </div>
+              `).join('')}
+            </div>
+
+            <!-- Footer: address + total -->
+            <div class="order-footer">
+              <div class="order-address">
+                📍 ${order.address}
+              </div>
+              <div class="order-total">
+                Total: ₹${order.total.toFixed(2)}
+              </div>
+            </div>
+
+          </div>
+        `).join('');
+
+      } catch (err) {
+        container.innerHTML = `
+          <p style="color:var(--color-danger)">
+            ⚠ Could not load orders. ${err.message}
+          </p>`;
+      }
+    }
+
+    loadOrders();
+  </script>
+
+</body>
+</html>

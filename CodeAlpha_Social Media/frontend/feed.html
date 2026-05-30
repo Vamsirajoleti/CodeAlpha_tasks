@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-gram — Feed</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="feed">
+
+  <div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 42 42" fill="none">
+          <rect width="42" height="42" rx="12" fill="#7C3AED"/>
+          <path d="M21 8L33 20.5L21 33L9 20.5L21 8Z" fill="white" opacity="0.9"/>
+          <circle cx="21" cy="20.5" r="5" fill="#7C3AED"/>
+        </svg>
+        <span>V-gram</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="feed.html" class="nav-item active">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          <span>Home</span>
+        </a>
+
+        <a href="search.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <span>Search</span>
+        </a>
+
+        <a href="profile.html" class="nav-item">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <span>Profile</span>
+        </a>
+
+        <button class="nav-item" onclick="document.getElementById('post-content').focus(); window.scrollTo(0,0)">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>New Post</span>
+        </button>
+
+        <button class="nav-item nav-logout" onclick="logout()">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-user">
+        <img id="sidebar-avatar" src="https://i.pravatar.cc/80?u=me" alt="you">
+        <div class="sidebar-user-info">
+          <div class="sidebar-user-name" id="sidebar-username">Loading…</div>
+          <div class="sidebar-user-label">Your account</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Main Feed ── -->
+    <main class="main-content">
+
+      <!-- Stories -->
+      <div class="stories-bar" id="stories-bar"></div>
+
+      <!-- Create Post -->
+      <div class="create-post">
+        <div class="create-post-header">
+          <img id="create-post-avatar" src="https://i.pravatar.cc/80?u=me" alt="you">
+          <span style="color:var(--text-3);font-size:0.9rem">What's on your mind?</span>
+        </div>
+        <textarea id="post-content" placeholder="Share something with the world…"></textarea>
+        <div class="create-post-actions">
+          <button class="btn btn-primary btn-sm" id="post-btn">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+            </svg>
+            Post
+          </button>
+        </div>
+      </div>
+
+      <!-- Posts Feed -->
+      <div id="posts-feed"></div>
+    </main>
+
+    <!-- ── Right Panel ── -->
+    <aside class="right-panel">
+      <!-- Search -->
+      <div class="panel-section">
+        <div class="panel-title">Quick Search</div>
+        <div class="search-input-wrap">
+          <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <input type="text" class="search-input" id="quick-search" placeholder="Search users…">
+        </div>
+        <div id="search-results"></div>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="panel-section">
+        <div class="panel-title">Who to Follow</div>
+        <div id="suggestions-list">
+          <!-- Loaded via JS -->
+          <div class="skeleton sk-line" style="width:100%;height:48px;border-radius:8px;margin-bottom:10px"></div>
+          <div class="skeleton sk-line" style="width:100%;height:48px;border-radius:8px;margin-bottom:10px"></div>
+          <div class="skeleton sk-line" style="width:100%;height:48px;border-radius:8px"></div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- Story Modal -->
+  <div class="story-modal-overlay" id="story-modal-overlay" onclick="if(event.target===this) closeStory()">
+    <div class="story-modal">
+      <div class="story-progress-bar">
+        <div class="story-progress-fill" id="story-progress-fill" style="width:0%"></div>
+      </div>
+      <div class="story-modal-header">
+        <img id="story-user-img" src="" alt="user">
+        <div>
+          <div class="story-modal-username" id="story-username"></div>
+          <div class="story-modal-time">Today</div>
+        </div>
+        <button class="story-modal-close" onclick="closeStory()">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <img id="story-image" class="story-modal-image" src="" alt="story">
+      <div class="story-modal-caption">Shared a moment ✨</div>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+  <script src="script.js"></script>
+</body>
+</html>

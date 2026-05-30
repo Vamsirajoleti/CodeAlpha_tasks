@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V-Store — Products</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/main.css" />
+
+  <style>
+    /* ── Category filter bar ── */
+    .categories {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .cat-btn {
+      padding: 8px 20px;
+      border-radius: 99px;
+      border: 1.5px solid var(--color-border);
+      background: #fff;
+      font-family: var(--font-body);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s ease;
+      color: var(--color-text-muted);
+    }
+
+    .cat-btn:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+
+    .cat-btn.active {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+    }
+
+    /* ── Category badge on card ── */
+    .cat-badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: .75rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .cat-electronics { background: #e0f2fe; color: #0369a1; }
+    .cat-clothing    { background: #fce7f3; color: #be185d; }
+    .cat-accessories { background: #f0fdf4; color: #15803d; }
+    .cat-home        { background: #fef9c3; color: #a16207; }
+    .cat-other       { background: #f3f4f6; color: #4b5563; }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header / Nav ────────────────────────────────────── -->
+  <header class="header">
+    <div class="container">
+      <a class="brand" href="index.html">🛍 V-Store</a>
+      <nav class="nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">
+          Cart <span id="cart-count">0</span>
+        </a>
+        <a href="login.html" id="auth-link">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main>
+    <div class="container">
+      <h1 class="page-title">All Products</h1>
+
+      <!-- Category filter buttons -->
+      <div class="categories">
+        <button class="cat-btn active" onclick="filterCategory('all', this)">🏷 All</button>
+        <button class="cat-btn" onclick="filterCategory('Electronics', this)">⚡ Electronics</button>
+        <button class="cat-btn" onclick="filterCategory('Clothing', this)">👕 Clothing</button>
+        <button class="cat-btn" onclick="filterCategory('Accessories', this)">👜 Accessories</button>
+        <button class="cat-btn" onclick="filterCategory('Home', this)">🏠 Home</button>
+        <button class="cat-btn" onclick="filterCategory('Other', this)">📦 Other</button>
+      </div>
+
+      <!-- Products grid -->
+      <div id="products" class="grid">
+        <div class="card skeleton" style="height:300px"></div>
+        <div class="card skeleton" style="height:300px"></div>
+        <div class="card skeleton" style="height:300px"></div>
+        <div class="card skeleton" style="height:300px"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="assets/main.js"></script>
+  <script>
+
+    // Store all products so we can filter without re-fetching
+    let allProducts = [];
+
+    /** Fetches all products once, stores them, then renders. */
+    async function loadProducts() {
+      const container = document.getElementById('products');
+
+      try {
+        const res = await fetch(API_BASE + '/products');
+        if (!res.ok) throw new Error('Server error: ' + res.status);
+
+        allProducts = await res.json();
+        renderProducts(allProducts);
+
+      } catch (err) {
+        container.innerHTML = `
+          <p style="grid-column:1/-1; color:var(--color-danger)">
+            ⚠ Could not load products. Make sure the backend is running.<br>
+            <small>${err.message}</small>
+          </p>`;
+      }
+    }
+
+    /**
+     * Filters allProducts by category and re-renders.
+     * @param {string} category - 'all' or a category name
+     * @param {HTMLElement} btn - the clicked button (to set active style)
+     */
+    function filterCategory(category, btn) {
+      // Update active button
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filtered = category === 'all'
+        ? allProducts
+        : allProducts.filter(p => p.category === category);
+
+      renderProducts(filtered);
+    }
+
+    /**
+     * Renders a list of products into the grid.
+     * @param {Array} products
+     */
+    function renderProducts(products) {
+      const container = document.getElementById('products');
+
+      if (products.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="grid-column:1/-1">
+            <div class="empty-icon">📦</div>
+            <h3>No products in this category</h3>
+            <p>Try another category!</p>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = products.map(p => `
+        <div class="card">
+          <img
+            class="card-img"
+            src="${p.image || ''}"
+            alt="${p.title}"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"
+          />
+          <div class="card-img-placeholder" style="display:none">🖼</div>
+
+          <div class="card-body">
+            <span class="cat-badge cat-${(p.category||'other').toLowerCase()}">${p.category || 'Other'}</span>
+            <h3>${p.title}</h3>
+            <p>${p.description}</p>
+          </div>
+
+          <div class="card-footer">
+            <span class="price">₹${p.price}</span>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-secondary btn-sm" onclick="viewProduct('${p._id}')">View</button>
+              <button class="btn btn-primary btn-sm" onclick="addToCart('${p._id}', '${p.title}', ${p.price})">+ Cart</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function viewProduct(id) {
+      window.location.href = 'product.html?id=' + id;
+    }
+
+    loadProducts();
+  </script>
+
+</body>
+</html>

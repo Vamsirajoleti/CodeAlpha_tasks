@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>V-gram — Create Account</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="register">
+
+  <div class="auth-page">
+    <!-- Left Brand Panel -->
+    <div class="auth-brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="42" height="42" rx="12" fill="#7C3AED"/>
+          <path d="M21 8L33 20.5L21 33L9 20.5L21 8Z" fill="white" opacity="0.9"/>
+          <circle cx="21" cy="20.5" r="5" fill="#7C3AED"/>
+        </svg>
+        <span>V-gram</span>
+      </div>
+
+      <h1 class="brand-tagline">
+        Start your <span>story</span><br>today.
+      </h1>
+      <p class="brand-sub">
+        Create an account and join a community of creators, developers, photographers, and dreamers.
+      </p>
+
+      <div class="preview-cards">
+        <div class="preview-card">
+          <img class="preview-avatar" src="https://i.pravatar.cc/80?u=sara" alt="sara">
+          <div class="preview-text">
+            <div class="preview-name">sara_lens</div>
+            <div class="preview-msg">Golden hour magic 📸</div>
+          </div>
+          <div class="preview-likes">♥ 310</div>
+        </div>
+        <div class="preview-card">
+          <img class="preview-avatar" src="https://i.pravatar.cc/80?u=kai" alt="kai">
+          <div class="preview-text">
+            <div class="preview-name">kai_design</div>
+            <div class="preview-msg">New portfolio redesign is live ✨</div>
+          </div>
+          <div class="preview-likes">♥ 156</div>
+        </div>
+        <div class="preview-card">
+          <img class="preview-avatar" src="https://i.pravatar.cc/80?u=nova" alt="nova">
+          <div class="preview-text">
+            <div class="preview-name">nova_x</div>
+            <div class="preview-msg">Weekend road trip photos 🚗</div>
+          </div>
+          <div class="preview-likes">♥ 93</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Form Panel -->
+    <div class="auth-form-panel">
+      <h2>Create account</h2>
+      <p class="sub">Join V-gram for free — takes 30 seconds</p>
+
+      <form id="register-form" novalidate>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <div class="input-wrap">
+            <input type="text" id="username" placeholder="your_username" autocomplete="username" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <div class="input-wrap">
+            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <input type="password" id="password" placeholder="Min. 6 characters" autocomplete="new-password" required>
+            <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Toggle password">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" id="register-btn">Create Account</button>
+      </form>
+
+      <div class="auth-switch">
+        Already have an account? <a href="index.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container"></div>
+  <script src="script.js"></script>
+</body>
+</html>

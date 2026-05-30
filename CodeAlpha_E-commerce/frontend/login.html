@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — ShopAlpha</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/main.css" />
+</head>
+<body>
+
+  <!-- ── Header / Nav ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="container">
+      <a class="brand" href="index.html">🛍 V-Store</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="orders.html">My Orders</a>
+        <a href="cart.html" class="cart-link">
+          Cart <span id="cart-count">0</span>
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main>
+    <div class="container">
+      <div class="auth-card mt-3">
+
+        <h2>Welcome back</h2>
+        <p class="subtitle">Log in to your ShopAlpha account</p>
+
+        <!-- Login form -->
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            class="form-control"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            class="form-control"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button
+          class="btn btn-primary btn-block mt-2"
+          id="login-btn"
+          onclick="handleLogin()"
+        >
+          Log In
+        </button>
+
+        <div class="auth-footer mt-2">
+          Don't have an account? <a href="register.html">Register</a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Shared utilities ───────────────────────────────────── -->
+  <script src="assets/main.js"></script>
+
+  <!-- ── Page-specific logic ───────────────────────────────── -->
+  <script>
+
+    // Redirect already-logged-in users away from this page
+    if (getToken()) {
+      window.location.href = 'index.html';
+    }
+
+    /**
+     * Reads email + password, posts to the auth API.
+     * On success: stores the JWT token and redirects to home.
+     * On failure: shows the error message returned by the server.
+     */
+    async function handleLogin() {
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const btn      = document.getElementById('login-btn');
+
+      // Basic client-side validation
+      if (!email || !password) {
+        showToast('Please fill in all fields.');
+        return;
+      }
+
+      btn.disabled    = true;
+      btn.textContent = 'Logging in…';
+
+      try {
+        const res = await fetch(API_BASE + '/auth/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('token', data.token);
+          showToast('Logged in! Redirecting…', 1500);
+          setTimeout(() => { window.location.href = 'index.html'; }, 1200);
+
+        } else {
+          showToast(data.message || 'Login failed. Check your credentials.');
+          btn.disabled    = false;
+          btn.textContent = 'Log In';
+        }
+
+      } catch (err) {
+        showToast('Network error. Is the backend running?');
+        btn.disabled    = false;
+        btn.textContent = 'Log In';
+      }
+    }
+
+    // Allow submitting with the Enter key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleLogin();
+    });
+  </script>
+
+</body>
+</html>

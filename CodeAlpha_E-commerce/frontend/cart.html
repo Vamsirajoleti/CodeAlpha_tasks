@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your Cart — ShopAlpha</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="assets/main.css" />
+</head>
+<body>
+
+  <!-- ── Header / Nav ──────────────────────────────────────── -->
+  <header class="header">
+    <div class="container">
+      <a class="brand" href="index.html">🛍 V-Store</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="cart.html" class="cart-link active">
+          Cart <span id="cart-count">0</span>
+        </a>
+        <a href="login.html" id="auth-link">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main Content ──────────────────────────────────────── -->
+  <main>
+    <div class="container">
+      <h1 class="page-title">Your Cart</h1>
+
+      <!-- Two-column layout: item list + order summary -->
+      <div class="cart-layout">
+
+        <!-- Left: cart items list -->
+        <div id="cart-items"></div>
+
+        <!-- Right: order summary sidebar -->
+        <div class="order-summary" id="order-summary" style="display:none">
+          <h3>Order Summary</h3>
+
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <span id="subtotal">₹0</span>
+          </div>
+          <div class="summary-row">
+            <span>Shipping</span>
+            <span>Free</span>
+          </div>
+          <div class="summary-row total">
+            <span>Total</span>
+            <span id="total">₹0</span>
+          </div>
+
+          <button
+            class="btn btn-primary btn-block mt-3"
+            onclick="proceedToCheckout()"
+          >
+            Proceed to Checkout →
+          </button>
+
+          <a href="index.html" class="btn btn-secondary btn-block mt-1">
+            Continue Shopping
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Shared utilities ───────────────────────────────────── -->
+  <script src="assets/main.js"></script>
+
+  <!-- ── Page-specific logic ───────────────────────────────── -->
+  <script>
+    /**
+     * Renders the full cart — items list + summary sidebar.
+     * Re-reads from localStorage each time so it always reflects
+     * the latest state (after qty changes / removals).
+     */
+    function renderCart() {
+      const cart         = getCart();
+      const itemsEl      = document.getElementById('cart-items');
+      const summaryEl    = document.getElementById('order-summary');
+
+      // ── Empty state ────────────────────────────────────────
+      if (cart.length === 0) {
+        itemsEl.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🛒</div>
+            <h3>Your cart is empty</h3>
+            <p>Browse our products and add something you love.</p>
+            <a href="index.html" class="btn btn-primary mt-2">Start Shopping</a>
+          </div>`;
+        summaryEl.style.display = 'none';
+        return;
+      }
+
+      // ── Item rows ──────────────────────────────────────────
+      itemsEl.innerHTML = `
+        <div class="cart-items">
+          ${cart.map((item, index) => `
+            <div class="cart-item">
+
+              <div class="cart-item-info">
+                <h4>${item.title}</h4>
+                <span class="text-muted">₹${item.price} each</span>
+              </div>
+
+              <!-- Quantity controls -->
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty(${index}, -1)">−</button>
+                <span class="qty-value">${item.quantity}</span>
+                <button class="qty-btn" onclick="changeQty(${index}, +1)">+</button>
+              </div>
+
+              <!-- Line total -->
+              <span class="price">₹${(item.price * item.quantity).toFixed(2)}</span>
+
+              <!-- Remove button -->
+              <button class="btn btn-danger btn-sm" onclick="removeItem(${index})">Remove</button>
+
+            </div>
+          `).join('')}
+        </div>`;
+
+      // ── Order summary ──────────────────────────────────────
+      const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      document.getElementById('subtotal').textContent = `₹${total.toFixed(2)}`;
+      document.getElementById('total').textContent    = `₹${total.toFixed(2)}`;
+      summaryEl.style.display = 'block';
+    }
+
+    /**
+     * Changes the quantity of an item by `delta` (+1 or -1).
+     * Removes the item automatically when quantity reaches 0.
+     */
+    function changeQty(index, delta) {
+      const cart = getCart();
+      cart[index].quantity += delta;
+
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1); // remove if qty hits 0
+      }
+
+      saveCart(cart);
+      updateCartCount();
+      renderCart();
+    }
+
+    /** Removes an item from the cart by its array index. */
+    function removeItem(index) {
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      updateCartCount();
+      renderCart();
+    }
+
+    /**
+     * Validates login before going to checkout.
+     * Users who are not logged in are redirected to login.html.
+     */
+    function proceedToCheckout() {
+      if (!getToken()) {
+        showToast('Please log in to checkout');
+        setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+        return;
+      }
+      window.location.href = 'checkout.html';
+    }
+
+    // Initial render
+    renderCart();
+  </script>
+
+</body>
+</html>
