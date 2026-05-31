@@ -67,7 +67,7 @@ This repository was created as part of my **CodeAlpha Full Stack Development Int
 
 ## 👨‍💻 Developer
 
-**Vamsi (Venom)**  
+**Vamsi**  
 Full Stack Development Intern  
 
 ---
